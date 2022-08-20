@@ -1,5 +1,6 @@
 package com.repin.potd.service;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.repin.potd.model.NasaPotd;
 import org.jvnet.hk2.annotations.Service;
 import org.springframework.http.MediaType;
@@ -11,19 +12,23 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Optional;
 
+/**
+ * Picture of the day service implementation.
+ */
 @Service
 @ParametersAreNonnullByDefault
 public class CachingPotdService implements PotdService {
 
+    private static final String PICTURE_FORMAT_JPG = "jpg";
     private final String imageApiUri;
     private final String apiKey;
     private final WebClient client;
     private BufferedImage image;
-    private URL potdUrl;
+
+    private ByteArrayOutputStream outputStream;
 
     public CachingPotdService(String imageApiUri, String apiKey, WebClient client) {
         this.imageApiUri = imageApiUri;
@@ -31,23 +36,62 @@ public class CachingPotdService implements PotdService {
         this.client = client;
     }
 
-    @Override
-    public void updatePicture() throws IOException {
-        potdUrl = getPotdUrl();
-        image = ImageIO.read(potdUrl);
-    }
-
+    /**
+     * Get picture of the day by NASA.
+     * @return  byte array with picture data in jpg format.
+     */
     @Override
     public byte[] getPicture() throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         if (image == null) updatePicture();
-        ImageIO.write(image, "jpg", outputStream);
-        return outputStream.toByteArray();
+        return outputStream != null
+                ? outputStream.toByteArray()
+                : null;
     }
 
+    /**
+     * Update picture of the day image file.
+     *
+     * @return size of picture (in pixels). If size is 0 then picture is empty.
+     */
+    @Override
+    public long updatePicture() throws IOException {
+        long size = updateImageFile(getPotdUrl());
+        updateOutputBuffer();
+        return size;
+    }
+
+    private void updateOutputBuffer() throws IOException {
+        outputStream = new ByteArrayOutputStream();
+        writeImageToOutputStream();
+    }
+
+    private void writeImageToOutputStream() throws IOException {
+        ImageIO.write(image, PICTURE_FORMAT_JPG, outputStream);
+    }
+
+    @VisibleForTesting
+    long updateImageFile(URL url) throws IOException {
+        image = ImageIO.read(url);
+        return image != null
+                // possible int overload
+                ? (long) image.getWidth() * image.getHeight()
+                : 0;
+    }
+
+    /**
+     * Requests JSON with information about photo of the day.
+     * @return  photo of the day URL.
+     */
     @Nonnull
-    private URL getPotdUrl() {
-        var nasaPotd = Optional.ofNullable(client.get()
+    @VisibleForTesting
+    URL getPotdUrl() {
+        var nasaPotd = getNasaPotdDto();
+        return nasaPotd.url();
+    }
+
+    @VisibleForTesting
+    NasaPotd getNasaPotdDto() {
+        return Optional.ofNullable(client.get()
                 .uri(uriBuilder -> uriBuilder
                         .path(imageApiUri)
                         .queryParam("api_key", apiKey)
@@ -56,7 +100,5 @@ public class CachingPotdService implements PotdService {
                 .retrieve()
                 .bodyToMono(NasaPotd.class)
                 .block()).orElseThrow(() -> new RuntimeException("Empty response"));
-        potdUrl = nasaPotd.url();
-        return potdUrl;
     }
 }
