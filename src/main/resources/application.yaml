@@ -1,0 +1,4 @@
+api-key:  ${API_KEY}
+bot-token:  ${BOT_TOKEN}
+potd-base-url: https://api.nasa.gov/
+image-api-uri: /planetary/apod

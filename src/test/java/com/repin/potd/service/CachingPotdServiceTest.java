@@ -1,10 +1,9 @@
 package com.repin.potd.service;
 
-import io.netty.util.internal.StringUtil;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -16,18 +15,18 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 
-class CachingPotdServiceTest {
+
+class CachingPotdServiceTest extends FunctionalTest {
 
     public static final String IMAGE_FILE_PATH = "src/test/resources/baby yoda.jpg";
-    private CachingPotdService service =
-            new CachingPotdService("thisUrlDoesNotMatter",
-                    StringUtil.EMPTY_STRING,
-                    WebClient.create());
+
+    @Autowired
+    private CachingPotdService cachingPotdService;
 
     @Test
     @DisplayName("Проверка основного флоу обновления картинки.")
     void shouldUpdateImage() throws IOException {
-        CachingPotdService spyService = Mockito.spy(service);
+        CachingPotdService spyService = Mockito.spy(cachingPotdService);
         Mockito.doAnswer(invocation -> "someUrl").when(spyService).getPotdUrl();
         Mockito.doAnswer(invocation -> 10_000L).when(spyService).updatePicture();
         var size = spyService.updatePicture();
@@ -40,10 +39,10 @@ class CachingPotdServiceTest {
     void shouldGetPicture() throws IOException, NoSuchFieldException, IllegalAccessException {
         File input = new File(IMAGE_FILE_PATH);
         BufferedImage babyYodaImage = ImageIO.read(input);
-        Field imageField = service.getClass().getDeclaredField("image");
+        Field imageField = cachingPotdService.getClass().getDeclaredField("image");
         imageField.setAccessible(true);
-        imageField.set(service, babyYodaImage);
-        CachingPotdService spyService = Mockito.spy(service);
+        imageField.set(cachingPotdService, babyYodaImage);
+        CachingPotdService spyService = Mockito.spy(cachingPotdService);
 
         Mockito.doAnswer(invocation -> 10_000L).when(spyService).updateImageFile(any());
         Mockito.doAnswer(invocation -> null).when(spyService).getPotdUrl();

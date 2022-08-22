@@ -1,0 +1,4 @@
+api-key: someKey
+bot-token: someToken
+potd-base-url: someUrl
+image-api-uri: /someUri/

@@ -2,7 +2,6 @@ package com.repin.potd.service;
 
 import com.google.common.annotations.VisibleForTesting;
 import com.repin.potd.model.NasaPotd;
-import org.jvnet.hk2.annotations.Service;
 import org.springframework.http.MediaType;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -18,7 +17,6 @@ import java.util.Optional;
 /**
  * Picture of the day service implementation.
  */
-@Service
 @ParametersAreNonnullByDefault
 public class CachingPotdService implements PotdService {
 
@@ -30,10 +28,14 @@ public class CachingPotdService implements PotdService {
 
     private ByteArrayOutputStream outputStream;
 
-    public CachingPotdService(String imageApiUri, String apiKey, WebClient client) {
-        this.imageApiUri = imageApiUri;
+    public CachingPotdService(
+            String apiKey,
+            String potdBaseUrl,
+            String imageApiUri
+    ) {
         this.apiKey = apiKey;
-        this.client = client;
+        this.imageApiUri = imageApiUri;
+        this.client = WebClient.create(potdBaseUrl);
     }
 
     /**
