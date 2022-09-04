@@ -9,6 +9,7 @@ plugins {
 group = 'com.repin'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '17'
+springBoot.mainClassName = 'com.repin.potd.Application'
 String apiPackageName = 'com.repin.potd.api'
 String apiInvokerPackageName = 'com.repin.potd.api.invoker'
 String apiModelPackageName = 'com.repin.potd.api.model'
