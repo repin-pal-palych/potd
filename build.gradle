@@ -1,5 +1,5 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.4'
+    id 'org.springframework.boot' version '2.7.0'
     id 'io.spring.dependency-management' version'1.0.11.RELEASE'
     id 'java'
     id "org.openapi.generator" version "6.0.1"
@@ -9,14 +9,22 @@ plugins {
 group = 'com.repin'
 version = '1.0-SNAPSHOT'
 sourceCompatibility = '17'
-springBoot.mainClassName = 'com.repin.potd.Application'
 String apiPackageName = 'com.repin.potd.api'
 String apiInvokerPackageName = 'com.repin.potd.api.invoker'
 String apiModelPackageName = 'com.repin.potd.api.model'
 
+springBoot {
+    mainClass = 'com.repin.potd.Application'
+}
+
 configurations {
     compileOnly {
         extendsFrom annotationProcessor
+    }
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-logging'
+        exclude group: 'ch.qos.logback', module: 'logback-classic'
+        exclude group: 'org.apache.logging.log4j', module: 'log4j-to-slf4j'
     }
 }
 
