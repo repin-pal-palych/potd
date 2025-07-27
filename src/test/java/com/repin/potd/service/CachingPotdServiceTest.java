@@ -14,7 +14,7 @@ import java.lang.reflect.Field;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
-
+import static org.mockito.Mockito.doAnswer;
 
 class CachingPotdServiceTest extends FunctionalTest {
 
@@ -27,8 +27,8 @@ class CachingPotdServiceTest extends FunctionalTest {
     @DisplayName("Проверка основного флоу обновления картинки.")
     void shouldUpdateImage() throws IOException {
         CachingPotdService spyService = Mockito.spy(cachingPotdService);
-        Mockito.doAnswer(invocation -> "someUrl").when(spyService).getPotdUrl();
-        Mockito.doAnswer(invocation -> 10_000L).when(spyService).updatePicture();
+        doAnswer(invocation -> "someUrl").when(spyService).getPotdUrl();
+        doAnswer(invocation -> 10_000L).when(spyService).updatePicture();
         var size = spyService.updatePicture();
         Mockito.verify(spyService, Mockito.times(1)).updatePicture();
         assertEquals(10_000L, size);
@@ -44,8 +44,8 @@ class CachingPotdServiceTest extends FunctionalTest {
         imageField.set(cachingPotdService, babyYodaImage);
         CachingPotdService spyService = Mockito.spy(cachingPotdService);
 
-        Mockito.doAnswer(invocation -> 10_000L).when(spyService).updateImageFile(any());
-        Mockito.doAnswer(invocation -> null).when(spyService).getPotdUrl();
+        doAnswer(invocation -> 10_000L).when(spyService).updateImageFile(any());
+        doAnswer(invocation -> null).when(spyService).getPotdUrl();
 
         spyService.updatePicture();
         byte[] picture = spyService.getPicture();

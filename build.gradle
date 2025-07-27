@@ -1,14 +1,14 @@
 plugins {
-    id 'org.springframework.boot' version '2.7.0'
+    id 'org.springframework.boot' version '3.2.5'
     id 'io.spring.dependency-management' version'1.0.11.RELEASE'
     id 'java'
-    id "org.openapi.generator" version "6.0.1"
+    id "org.openapi.generator" version "7.4.0"
     id 'idea'
 }
 
 group = 'com.repin'
 version = '1.0-SNAPSHOT'
-sourceCompatibility = '17'
+sourceCompatibility = '21'
 String apiPackageName = 'com.repin.potd.api'
 String apiInvokerPackageName = 'com.repin.potd.api.invoker'
 String apiModelPackageName = 'com.repin.potd.api.model'
@@ -36,11 +36,25 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.telegram:telegrambots-spring-boot-starter:6.1.0'
 
-    implementation 'org.openapitools:openapi-generator-gradle-plugin:6.0.1'
-    implementation 'org.openapitools:jackson-databind-nullable:0.2.3'
-    implementation 'javax.servlet:javax.servlet-api:4.0.1'
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'io.swagger.core.v3:swagger-models:2.2.21'
+    implementation 'io.swagger.core.v3:swagger-annotations:2.2.21'
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.5'
 
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+}
+
+openApiGenerate {
+    generatorName.set("spring")
+    inputSpec.set("$rootDir/api.yaml")
+    outputDir.set("$buildDir/generated/openapi")
+
+    apiPackage.set(apiPackageName)
+    invokerPackage.set(apiInvokerPackageName)
+    modelPackage.set(apiModelPackageName)
+
+    configOptions.put("useJakartaEe", "true") // Включаем генерацию под jakarta.*
 }
 
 test {
@@ -52,11 +66,11 @@ apply plugin: 'idea'
 
 idea {
     module {
-        generatedSourceDirs += "$buildDir/generated/openapi/src/main/java"
+        generatedSourceDirs += file("$buildDir/generated/openapi/src/main/java")
     }
 }
 
-sourceSets.main.java.srcDirs += "$buildDir/generated/openapi/src/main/java"
+sourceSets.main.java.srcDirs += file("$buildDir/generated/openapi/src/main/java")
 
 openApiGenerate {
     generatorName.set("spring")
