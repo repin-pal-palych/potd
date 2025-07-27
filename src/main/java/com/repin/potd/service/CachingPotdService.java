@@ -51,6 +51,18 @@ public class CachingPotdService implements PotdService {
         this.fileIdCache = fileIdCache;
     }
 
+    public CachingPotdService(
+        String apiKey,
+        String imageApiUri,
+        WebClient webClient,
+        Cache<String, String> fileIdCache
+    ) {
+        this.apiKey = apiKey;
+        this.imageApiUri = imageApiUri;
+        this.client = webClient;
+        this.fileIdCache = fileIdCache;
+    }
+
     /**
      * Get picture of the day by NASA.
      *
