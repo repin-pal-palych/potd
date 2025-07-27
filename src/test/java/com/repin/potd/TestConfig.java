@@ -1,10 +1,14 @@
 package com.repin.potd;
 
+import com.github.benmanes.caffeine.cache.Cache;
+import com.github.benmanes.caffeine.cache.Caffeine;
 import com.repin.potd.service.CachingPotdService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+
+import static java.util.concurrent.TimeUnit.MINUTES;
 
 @Configuration
 @Profile("test")
@@ -19,6 +23,14 @@ public class TestConfig {
 
     @Bean
     public CachingPotdService cachingPotdService() {
-        return new CachingPotdService(apiKey, potdBaseUrl, imageApiUri);
+        return new CachingPotdService(apiKey, potdBaseUrl, imageApiUri, fileIdCache());
+    }
+
+    @Bean
+    public Cache<String, String> fileIdCache() {
+        return Caffeine.newBuilder()
+            .expireAfterWrite(10, MINUTES)
+            .maximumSize(1000)
+            .build();
     }
 }

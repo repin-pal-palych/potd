@@ -1,11 +1,13 @@
 package com.repin.potd.service;
 
+import com.repin.potd.model.PictureInfo;
+
 import java.io.IOException;
 
 /**
  * Picture of the day service interface.
  */
 public interface PotdService {
-    long updatePicture() throws IOException;
-    byte[] getPicture() throws IOException;
+    void updatePicture() throws IOException;
+    PictureInfo getPicture() throws IOException;
 }

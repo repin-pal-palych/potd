@@ -1,7 +1,8 @@
 package com.repin.potd;
 
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+import static org.springframework.boot.SpringApplication.run;
 
 /**
  * Главный класс для запуска приложения.
@@ -10,6 +11,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class Application {
 
     public static void main(String[] args) {
-        SpringApplication.run(Application.class, args);
+        run(Application.class, args);
     }
 }
