@@ -13,6 +13,12 @@ String apiPackageName = 'com.repin.potd.api'
 String apiInvokerPackageName = 'com.repin.potd.api.invoker'
 String apiModelPackageName = 'com.repin.potd.api.model'
 
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(21))
+    }
+}
+
 springBoot {
     mainClass = 'com.repin.potd.Application'
 }
@@ -42,11 +48,6 @@ dependencies {
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
 
 test {
     useJUnitPlatform()
