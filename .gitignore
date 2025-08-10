@@ -68,3 +68,5 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/.idea/.name
+/.idea/uiDesigner.xml
